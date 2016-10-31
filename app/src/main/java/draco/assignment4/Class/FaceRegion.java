@@ -1,32 +1,34 @@
 package draco.assignment4.Class;
 
+import io.realm.RealmObject;
+
 /**
  * Created by Draco on 2016-10-25.
  */
 
-public class FaceRegion {
-    private int x;
-    private int y;
-    private int width;
-    private int height;
+public class FaceRegion extends RealmObject{
+    private float x;
+    private float y;
+    private float width;
+    private float height;
 
-    public int getX(){ return x; }
-    public void setX(int x){
+    public float getX(){ return x; }
+    public void setX(float x){
         this.x = x;
     }
 
-    public int getY(){ return y; }
-    public void setY(int y){
+    public float getY(){ return y; }
+    public void setY(float y){
         this.y = y;
     }
 
-    public int getWidth(){ return width; }
-    public void setWidth(int width){
+    public float getWidth(){ return width; }
+    public void setWidth(float width){
         this.width = width;
     }
 
-    public int getHeight(){ return height; }
-    public void setHeight(int height){
+    public float getHeight(){ return height; }
+    public void setHeight(float height){
         this.height = height;
     }
 

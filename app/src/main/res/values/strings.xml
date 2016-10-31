@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Assignment4</string>
+    <string name="loadImg">Load Images</string>
 </resources>
