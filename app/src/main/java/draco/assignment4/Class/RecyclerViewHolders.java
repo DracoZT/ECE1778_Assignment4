@@ -27,8 +27,8 @@ public class RecyclerViewHolders extends RecyclerView.ViewHolder implements View
 
     @Override
     public void onClick(View v) {
-        String photoUri_pos = Integer.toString(getLayoutPosition());
-        Intent fs_view = new Intent(v.getContext(), SingleImageView.class).putExtra("photo_info", photoUri_pos);
+        String photoUri = GalleryActivity.realmResults.get(getLayoutPosition()).getPhotoPath();
+        Intent fs_view = new Intent(v.getContext(), SingleImageView.class).putExtra("photo_info", photoUri);
         v.getContext().startActivity(fs_view);
     }
 }

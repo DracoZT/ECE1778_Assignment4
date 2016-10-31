@@ -17,7 +17,10 @@ import android.widget.Button;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 
+import draco.assignment4.Class.AsyncTaskModel;
 import draco.assignment4.Class.FaceRegion;
 import draco.assignment4.Class.Photo;
 import draco.assignment4.R;
@@ -49,14 +52,10 @@ public class MainActivity extends AppCompatActivity {
         config = new RealmConfiguration.Builder().build();
         Realm.setDefaultConfiguration(config);
         main_realm = Realm.getDefaultInstance();
-        main_realm.beginTransaction();
-        main_realm.deleteAll();
-        main_realm.commitTransaction();
 
         //get filelist
         File FileDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getPath() + "/camera");
         fileList = new ArrayList<>();
-
 
         for(File file : FileDirectory.listFiles()){
             if(file.getName().toLowerCase().endsWith(".jpg")){
@@ -64,28 +63,30 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+
+
         RealmQuery<Photo> p_query = main_realm.where(Photo.class);
         RealmResults<Photo> p_res = p_query.findAll();
 
-        /*
         if(p_res.size() != 0){
             Intent view_activity = new Intent(this, GalleryActivity.class);
             this.startActivity(view_activity);
             finish();
         }
-        */
 
         img_load = (Button) findViewById(R.id.LoadImg);
         img_load.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LoadImageToRealm loadTask = new LoadImageToRealm(MainActivity.this);
-                loadTask.execute();
+                AsyncTaskModel loadTask = new AsyncTaskModel(MainActivity.this);
+                Integer[] a = {2, 2};
+                loadTask.execute(a);
             }
         });
-
     }
 
+    /*
+    //asyncTask module
     private class LoadImageToRealm extends AsyncTask<Void, Integer, Void> {
         private ProgressDialog dialog;
         private int count = 0;
@@ -148,11 +149,12 @@ public class MainActivity extends AppCompatActivity {
                 dialog.dismiss();
             Intent gView = new Intent(context, GalleryActivity.class);
             startActivity(gView);
+            finish();
         }
     }
 
     public Bitmap UriToBit(String photo){
-        Bitmap bitmap = null;
+        Bitmap bitmap;
         BitmapFactory.Options options=new BitmapFactory.Options();
         options.inMutable=true;
         bitmap = BitmapFactory.decodeFile(photo, options);
@@ -161,4 +163,5 @@ public class MainActivity extends AppCompatActivity {
         double ratio = (double) x / (double) y;
         return Bitmap.createScaledBitmap(bitmap, (int) Math.round(720 * ratio), 720, false);
     }
+    */
 }
