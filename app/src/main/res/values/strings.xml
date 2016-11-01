@@ -1,12 +1,14 @@
 <resources>
     <string name="app_name">Assignment4</string>
     <string name="loadImg">Load Images</string>
-    <string name="delete_database">Delete DB</string>
-    <string name="delete_single_img">Delete Img</string>
+    <string name="delete_database">Empty Database</string>
+    <string name="delete_single_img">Delete Single Image</string>
     <string-array name="list_dialog">
         <item>1</item>
         <item>2</item>
         <item>4</item>
         <item>8</item>
     </string-array>
+    <string name="face_class">Faces</string>
+    <string name="all_class">All Photos</string>
 </resources>

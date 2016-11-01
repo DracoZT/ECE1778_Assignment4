@@ -11,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-
 import draco.assignment4.Class.Photo;
 import draco.assignment4.Class.RecyclerViewAdapter;
 import draco.assignment4.R;
@@ -26,6 +25,8 @@ public class GalleryActivity extends AppCompatActivity{
     public Realm realm;
     public static RealmResults<Photo> realmResults = null;
     private Context ctx = this;
+    RecyclerView rView;
+    RecyclerViewAdapter rcAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,13 +36,12 @@ public class GalleryActivity extends AppCompatActivity{
         realm = Realm.getDefaultInstance();
         realmResults = realm.where(Photo.class).findAll();
 
-        RecyclerView rView = (RecyclerView) findViewById(R.id.recyclerview);
+        rView = (RecyclerView) findViewById(R.id.recyclerview);
         GridLayoutManager gLayout = new GridLayoutManager(GalleryActivity.this, 2);
         rView.setHasFixedSize(true);
         rView.setLayoutManager(gLayout);
 
-        RecyclerViewAdapter rcAdapter = new RecyclerViewAdapter(GalleryActivity.this, realmResults);
-        rcAdapter.notifyDataSetChanged();
+        rcAdapter = new RecyclerViewAdapter(GalleryActivity.this, realmResults);
         rView.setAdapter(rcAdapter);
     }
 
@@ -73,6 +73,19 @@ public class GalleryActivity extends AppCompatActivity{
                 builder.setNegativeButton("No", null);
                 builder.setCancelable(true);
                 builder.create().show();
+                return true;
+
+            case R.id.all_photo:
+                realmResults = realm.where(Photo.class).findAll();
+                rcAdapter = new RecyclerViewAdapter(GalleryActivity.this, realmResults);
+                rView.setAdapter(rcAdapter);
+                return true;
+
+            case R.id.face:
+                realmResults = realm.where(Photo.class).isNotEmpty("faceRegions").findAll();
+                rcAdapter = new RecyclerViewAdapter(GalleryActivity.this, realmResults);
+                rView.setAdapter(rcAdapter);
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
