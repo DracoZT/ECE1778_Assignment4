@@ -49,7 +49,7 @@ public class SingleImageView extends AppCompatActivity {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inMutable = true;
         Bitmap bitmap = BitmapFactory.decodeFile(photo.getPhotoPath(), options);
-        float scale = bitmap.getWidth() / 720;
+        float scale = (float) ((double) bitmap.getHeight() / (double) 720);
         Bitmap tempBitmap= Bitmap.createBitmap(bitmap.getWidth(),bitmap.getHeight(),Bitmap.Config.RGB_565);
         Canvas tempCanvas = new Canvas(tempBitmap);
         tempCanvas.drawBitmap(bitmap,0,0,null);
@@ -83,6 +83,7 @@ public class SingleImageView extends AppCompatActivity {
                 realm.beginTransaction();
                 realmResults.deleteFirstFromRealm();
                 realm.commitTransaction();
+                realm.close();
                 finish();
 
             default:

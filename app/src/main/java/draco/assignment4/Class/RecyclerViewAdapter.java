@@ -4,19 +4,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
-import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import io.realm.RealmRecyclerViewAdapter;
-import io.realm.RealmResults;
 import draco.assignment4.R;
 import io.realm.OrderedRealmCollection;
-import io.realm.RealmRecyclerViewAdapter;
 
 
 /**

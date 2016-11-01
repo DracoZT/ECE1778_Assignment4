@@ -3,4 +3,10 @@
     <string name="loadImg">Load Images</string>
     <string name="delete_database">Delete DB</string>
     <string name="delete_single_img">Delete Img</string>
+    <string-array name="list_dialog">
+        <item>1</item>
+        <item>2</item>
+        <item>4</item>
+        <item>8</item>
+    </string-array>
 </resources>

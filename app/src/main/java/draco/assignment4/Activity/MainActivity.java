@@ -2,43 +2,42 @@ package draco.assignment4.Activity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Environment;
-import android.provider.MediaStore;
+import android.preference.DialogPreference;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.SparseArray;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-
+import java.util.concurrent.TimeUnit;
 import draco.assignment4.Class.AsyncTaskModel;
-import draco.assignment4.Class.FaceRegion;
 import draco.assignment4.Class.Photo;
 import draco.assignment4.R;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
-import io.realm.RealmList;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.face.Face;
-import com.google.android.gms.vision.face.FaceDetector;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     public Context context = this;
     public Realm main_realm;
     public RealmConfiguration config;
     public static ArrayList<String> fileList;
+    public static ProgressDialog mdialog;
+    public static int count;
+    private int thread;
 
     Button img_load;
 
@@ -63,105 +62,47 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
-
         RealmQuery<Photo> p_query = main_realm.where(Photo.class);
         RealmResults<Photo> p_res = p_query.findAll();
 
         if(p_res.size() != 0){
             Intent view_activity = new Intent(this, GalleryActivity.class);
             this.startActivity(view_activity);
+            main_realm.close();
             finish();
         }
 
+        //set img button
         img_load = (Button) findViewById(R.id.LoadImg);
         img_load.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AsyncTaskModel loadTask = new AsyncTaskModel(MainActivity.this);
-                Integer[] a = {2, 2};
-                loadTask.execute(a);
+                count = 0;
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Pick number of thread")
+                        .setItems(R.array.list_dialog, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                thread = (int) Math.pow(2, which);
+                                mdialog = new ProgressDialog(MainActivity.this);
+                                mdialog.setMessage("Importing photos now.");
+                                mdialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                                mdialog.setProgress(0);
+                                mdialog.setMax(fileList.size());
+                                mdialog.show();
+                                Executor executor = new ThreadPoolExecutor(thread, 8, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(fileList.size()));
+
+                                for(int i = 0;i < fileList.size();i++){
+                                    new AsyncTaskModel(MainActivity.this).executeOnExecutor(executor, fileList.get(i));
+                                }
+                            }
+                        });
+
+                builder.create().show();
+
             }
         });
     }
 
-    /*
-    //asyncTask module
-    private class LoadImageToRealm extends AsyncTask<Void, Integer, Void> {
-        private ProgressDialog dialog;
-        private int count = 0;
-
-        private LoadImageToRealm(MainActivity activity) {
-            dialog = new ProgressDialog(activity);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            dialog.setMessage("Doing something, please wait.");
-            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            dialog.setProgress(0);
-            dialog.setMax(fileList.size());
-            dialog.show();
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            Realm realm = Realm.getDefaultInstance();
-
-            for(;count < fileList.size();count++){
-                //convert uri to bitmap
-                Bitmap c_photo = UriToBit(fileList.get(count));
-                //initialize face detector
-                FaceDetector detector = new FaceDetector.Builder(context).setTrackingEnabled(false).build();
-                Frame frame = new Frame.Builder().setBitmap(c_photo).build();
-                SparseArray<Face> faces = detector.detect(frame);
-                detector.release();
-
-                realm.beginTransaction();
-                Photo photo = realm.createObject(Photo.class);
-                photo.setPhotoPath(fileList.get(count));
-                //RealmList<FaceRegion> face_list = new RealmList<>();
-                for(int i = 0;i < faces.size();i++){
-                    Face thisFace = faces.valueAt(i);
-                    FaceRegion faceRegion = new FaceRegion();
-                    faceRegion.setX(thisFace.getPosition().x);
-                    faceRegion.setY(thisFace.getPosition().y);
-                    faceRegion.setWidth(thisFace.getWidth());
-                    faceRegion.setHeight(thisFace.getHeight());
-                    //face_list.add(faceRegion);
-                    photo.getFaceRegions().add(realm.copyToRealm(faceRegion));
-                }
-                //photo.setFaceRegions(realm.copyToRealm());
-                realm.commitTransaction();
-                publishProgress(count);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            dialog.setProgress(values[0]);
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if(dialog.isShowing())
-                dialog.dismiss();
-            Intent gView = new Intent(context, GalleryActivity.class);
-            startActivity(gView);
-            finish();
-        }
-    }
-
-    public Bitmap UriToBit(String photo){
-        Bitmap bitmap;
-        BitmapFactory.Options options=new BitmapFactory.Options();
-        options.inMutable=true;
-        bitmap = BitmapFactory.decodeFile(photo, options);
-        int x = bitmap.getWidth();
-        int y = bitmap.getHeight();
-        double ratio = (double) x / (double) y;
-        return Bitmap.createScaledBitmap(bitmap, (int) Math.round(720 * ratio), 720, false);
-    }
-    */
 }
