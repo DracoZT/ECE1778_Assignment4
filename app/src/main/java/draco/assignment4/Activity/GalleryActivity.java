@@ -65,8 +65,6 @@ public class GalleryActivity extends AppCompatActivity{
                         realm.beginTransaction();
                         realm.deleteAll();
                         realm.commitTransaction();
-                        Intent back_to_main = new Intent(ctx, MainActivity.class);
-                        startActivity(back_to_main);
                         finish();
                     }
                 });

@@ -17,6 +17,7 @@ import io.realm.Realm;
 import static draco.assignment4.Activity.MainActivity.mdialog;
 import static draco.assignment4.Activity.MainActivity.fileList;
 import static draco.assignment4.Activity.MainActivity.count;
+import static draco.assignment4.Activity.MainActivity.missing_img_list;
 
 /**
  * Created by Draco on 2016-10-31.
@@ -73,11 +74,11 @@ public class AsyncTaskModel extends AsyncTask<String, Integer, Void>{
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        if(count == fileList.size()){
+        if(count == missing_img_list.size()){
             mdialog.dismiss();
             Intent gView = new Intent(ctx, GalleryActivity.class);
             ctx.startActivity(gView);
-            ((Activity)ctx).finish();
+            //((Activity)ctx).finish();
         }
     }
 
